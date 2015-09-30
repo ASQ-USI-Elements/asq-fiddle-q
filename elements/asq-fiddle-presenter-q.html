@@ -35,6 +35,7 @@
       min-height:300px;
       display: block;
       box-sizing: border-box;
+      --paper-tabs-selection-bar-color: #333;
     }
 
     #main-content {
@@ -127,7 +128,8 @@
           <iron-pages selected="{{_selectedTab}}">
             <div></div>
             
-            <iron-list id="submissionList" items="[[_submissions]]" as="submission" selection-enabled selected-item="{{_selectedSubmissionItem}}">
+            <iron-list id="submissionList" items="[[
+            submissions]]" as="submission" selection-enabled selected-item="{{_selectedSubmissionItem}}">
               <template>
                 <paper-item>#<span>[[index]]</span>&nbsp;&nbsp;<span>[[submission.submission.html]]</span>
                 </paper-item>
@@ -199,6 +201,11 @@
         notify: true
       },
 
+      
+      submissions: {
+        notify: true
+      },
+
       _selectedSubmissionItem: {
         observer: '_selectedSubmissionItemChanged'
       },
@@ -230,12 +237,12 @@
     attached: function() {
       var editors = ["html-editor", "css-editor", "js-editor"];
       editors.forEach(function(editorId){
-        this.$[editorId].addEventListener('editor-input', this._editorValueChanged.bind(this))
-      }.bind(this))
+        this.$[editorId].addEventListener('editor-input', this._editorValueChanged.bind(this));
+      }.bind(this));
     },
 
     togglePanel: function(){
-      this.$.drawerPanel.togglePanel()
+      this.$.drawerPanel.togglePanel();
     },
 
     _selectedSubmissionItemChanged: function(newItem, old){
@@ -384,7 +391,7 @@
     _onRestorePresenter: function (evt) {
       evt.questions.forEach(function(q){
        if(q.uid != this.uid) return;
-       this._submissions = q.answers;
+       this.submissions = q.answers;
       }.bind(this));
     },
 
@@ -392,7 +399,7 @@
       if (!evt.question || evt.question.uid !== this.uid)
         return;
 
-      this._submissions = evt.question.answers;
+      this.submissions = evt.question.answers;
     },
 
     _eventBusChanged: function (eventBus, old) {
