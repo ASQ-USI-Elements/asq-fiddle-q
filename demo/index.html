@@ -20,6 +20,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </script>
     <link rel="import" href="../asq-fiddle-q.html">
     <style>
+      body {
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        font-size: 14px;
+        margin: 0;
+        padding: 24px;
+        -webkit-tap-highlight-color: rgba(0,0,0,0);
+        -webkit-touch-callout: none;
+      }
       asq-fiddle-q{
         height: 100vh;
       }
@@ -29,17 +37,22 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </style>
   </head>
   <body unresolved>
-<!-- 
+
     <p>An example of <code>&lt;asq-fiddle-q&gt;</code>:</p>
     <h5>Viewer</h5>
     <asq-fiddle-q role="viewer">
-      <asq-stem><h4>Try to recreate the following image using HTML5 and CSS</h4><asq-stem>
-      <img src="mockup.png" alt="">
+      <asq-stem><h4>Paint a circle in the canvas</h4></asq-stem>
+      <template seed>
+        <pre html><canvas id="c"></canvas></pre>
+        <pre css>#c {width: 200px; height: 200px}</pre>
+        <pre js>//Paint a circle in the canvas
+var c = document.getElementById("c");</pre>
+      </template> 
     </asq-fiddle-q>
-     -->
+    
     <h5>Presenter</h5>
     <asq-fiddle-q role="presenter">
-      <asq-stem><h4>Try to recreate the following image using HTML5 and CSS</h4><asq-stem>
+      <asq-stem><h4>Try to recreate the following image using HTML5 and CSS</h4></asq-stem>
       <img src="mockup.png" alt="">
     </asq-fiddle-q>
 

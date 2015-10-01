@@ -10,18 +10,21 @@
 
 ### Example:
 
-    <asq-fiddle-viewer-q>
-      <asq-stem>
-        <h4>Try to recreate the following image using HTML5 and CSS</h4>
-      <asq-stem>
-      <img src="mockup.png" alt="">
-    </asq-fiddle-viewer-q>
+    <asq-fiddle-q-viewer">
+      <asq-stem><h4>Paint a circle in the canvas</h4></asq-stem>
+      <template seed>
+        <pre html><canvas id="c"></canvas></pre>
+        <pre css>#c {width: 200px; height: 200px}</pre>
+        <pre js>//Paint a circle in the canvas
+var c = document.getElementById("c");</pre>
+      </template> 
+    </asq-fiddle-q-viewer>
 
 @group DELFT Elements
-@element asq-fiddle-viewer-q
+@element asq-fiddle-q-viewer
 @demo demo/index.html
 -->
-<dom-module id="asq-fiddle-viewer-q">
+<dom-module id="asq-fiddle-q-viewer">
   <template>
     <style>
       :host {
@@ -30,7 +33,7 @@
         min-height:300px;
         display: block;
         box-sizing: border-box;
-      }
+      }      
 
       #main-content {
         @apply(--layout-flex);
@@ -87,7 +90,11 @@
       }
     </style>
 
-    <content></content>
+    <div class="content-wrapper">
+      <content id="contentTmpl" select="template[seed]"></content>
+      <content></content>
+    </div>
+
     <div id="main-content">
       <div id="left-column">
         <div id="html-editor-pane">
@@ -96,7 +103,7 @@
         </div>
         <div class="h-seperator" id="left-h-seperator" on-mousedown="onMousedown"></div>
         <div id="js-editor-pane">
-          <ace-element id="js-editor" class="ace-editor" theme="textmate" mode="JavaScript"></ace-element>
+          <ace-element id="js-editor" class="ace-editor" theme="textmate" mode="javascript"></ace-element>
           <div class="pane-label">JavaScript</div>
         </div>
       </div>
@@ -121,7 +128,7 @@
 
   Polymer({
 
-    is: 'asq-fiddle-viewer-q',
+    is: 'asq-fiddle-q-viewer',
 
     behaviors: [ASQ.asqQuestionElementBehavior],
 
@@ -171,10 +178,31 @@
           "</html>",
 
     attached: function() {
-      var editors = ["html-editor", "css-editor", "js-editor"];
-      editors.forEach(function(editorId){
-        this.$[editorId].addEventListener('editor-input', this._editorValueChanged.bind(this))
-      }.bind(this))
+      //delay to make sure ace-editors are initialized
+      setTimeout(function(){
+
+        var editors = ["html-editor", "css-editor", "js-editor"];
+        // listen for value change on editors
+        editors.forEach(function(editorId){
+          this.$[editorId].addEventListener('editor-input', this._editorValueChanged.bind(this))
+        }.bind(this))
+
+        // initialize editor values
+        var tpl = Polymer.dom(this.$.contentTmpl).getDistributedNodes()[0];
+        if(!tpl) return;
+        
+        var initVal = {};
+        editors.forEach(function(editorId){
+          var prop = editorId.replace('-editor', '');
+          var el = tpl.content.querySelector('[' + prop + ']')
+          if(!el) return;
+          initVal[prop] = el.innerHTML;
+        }.bind(this))
+
+        this.value = initVal;
+
+      }.bind(this), 1)
+
     },
 
     _valueChanged: function(newVal){
@@ -183,6 +211,7 @@
         var prop = editorId.replace('-editor', '');
         if(this.value[prop] && this.$[editorId].editorValue != this.value[prop]){
           this.$[editorId].editorValue = this.value[prop];
+          this.$[editorId].editor.clearSelection(1);
         }
       }.bind(this))
     },

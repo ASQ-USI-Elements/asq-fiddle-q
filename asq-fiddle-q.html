@@ -3,19 +3,24 @@
 <link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
 
 <link rel="import" href="../asq-base/asq-base.html">
-<link rel="import" href="elements/asq-fiddle-viewer-q.html">
-<link rel="import" href="elements/asq-fiddle-presenter-q.html">
+<link rel="import" href="elements/asq-fiddle-q-viewer.html">
+<link rel="import" href="elements/asq-fiddle-q-presenter.html">
 
 <!--
  Give students an image of a simple Web page + the HTML and ask them to write out the CSS to reproduce this image.
 
+ To seed the editors with initial values add a template with the attribute `seed`. Inside the template add elements with the tags `html`, `css` and `js` respectively. Their innerHTML will seed the corresponding editors.
+
 ### Example:
 
     <asq-fiddle-q>
-      <asq-stem>
-        <h4>Try to recreate the following image using HTML5 and CSS</h4>
-      <asq-stem>
-      <img src="mockup.png" alt="">
+      <asq-stem><h4>Paint a circle in the canvas</h4></asq-stem>
+      <template seed>
+        <pre html><canvas id="c"></canvas></pre>
+        <pre css>#c {width: 200px; height: 200px}</pre>
+        <pre js>//Paint a circle in the canvas
+    var c = document.getElementById("c");</pre>
+      </template> 
     </asq-fiddle-q>
 
 @group DELFT Elements
@@ -35,16 +40,16 @@
 
      <!-- Viewer -->
      <template is="dom-if" if="{{hasRole(role, roles.VIEWER)}}" restamp>
-       <asq-fiddle-viewer-q role="viewer" uid="[[uid]]" event-bus="[[eventBus]]" value="{{value}}">
+       <asq-fiddle-q-viewer role="viewer" uid="[[uid]]" event-bus="[[eventBus]]" value="{{value}}">
          <content></content>
-       </asq-fiddle-viewer-q>
+       </asq-fiddle-q-viewer>
      </template>
      
      <!-- Presenter -->
     <template is="dom-if" if="{{hasRole(role, roles.PRESENTER)}}" restamp>
-       <asq-fiddle-presenter-q role="presenter" uid="[[uid]]" event-bus="[[eventBus]]" value="{{value}}">
+       <asq-fiddle-q-presenter role="presenter" uid="[[uid]]" event-bus="[[eventBus]]" value="{{value}}">
          <content></content>
-       </asq-fiddle-presenter-q>
+       </asq-fiddle-q-presenter>
      </template>
   </template>
 
@@ -89,9 +94,9 @@
      */
     submit: function () {
       if (this.role == this.roles.VIEWER) {
-        var el = this.$$('asq-fiddle-viewer-q');
+        var el = this.$$('asq-fiddle-q-viewer');
         if (!el) {
-          throw new Error('submit(): expected asq-fiddle-viewer-q element to exist');
+          throw new Error('submit(): expected asq-fiddle-q-viewer element to exist');
         }
         return el.submit();
       }
