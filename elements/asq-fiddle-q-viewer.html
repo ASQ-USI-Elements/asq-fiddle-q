@@ -185,6 +185,7 @@ var c = document.getElementById("c");</pre>
         // listen for value change on editors
         editors.forEach(function(editorId){
           this.$[editorId].addEventListener('editor-input', this._editorValueChanged.bind(this))
+          this.$[editorId].editor.resize();
         }.bind(this))
 
         // initialize editor values
