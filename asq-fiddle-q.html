@@ -13,7 +13,7 @@
 
 ### Example:
 
-    <asq-fiddle-q>
+    <asq-fiddle-q selected-panes='["html", "js", "result"]'>
       <asq-stem><h4>Paint a circle in the canvas</h4></asq-stem>
       <template seed>
         <pre html><canvas id="c"></canvas></pre>
@@ -40,14 +40,26 @@
 
      <!-- Viewer -->
      <template is="dom-if" if="{{hasRole(role, roles.VIEWER)}}" restamp>
-       <asq-fiddle-q-viewer role="viewer" uid="[[uid]]" event-bus="[[eventBus]]" value="{{value}}">
+       <asq-fiddle-q-viewer
+         role="viewer"
+         uid="[[uid]]"
+         event-bus="[[eventBus]]"
+         value="{{value}}"
+         selected-panes="{{selectedPanes}}"
+        >
          <content></content>
        </asq-fiddle-q-viewer>
      </template>
      
      <!-- Presenter -->
     <template is="dom-if" if="{{hasRole(role, roles.PRESENTER)}}" restamp>
-       <asq-fiddle-q-presenter role="presenter" uid="[[uid]]" event-bus="[[eventBus]]" value="{{value}}">
+      <asq-fiddle-q-presenter
+       role="presenter"
+       uid="[[uid]]"
+       event-bus="[[eventBus]]"
+       value="{{value}}"
+       selected-panes="{{selectedPanes}}"
+      >
          <content></content>
        </asq-fiddle-q-presenter>
      </template>
@@ -64,6 +76,18 @@
     behaviors: [ASQ.asqQuestionElementBehavior],
 
     properties: {
+      /**
+       * The panes to display. When specifying it as an attribute, use an array serialized as string.
+       * For Example: `selected-panes='["js", "result"]'`. Notice the single quotes for the attributes
+       * and the double quotes for the array items.
+       */
+      selectedPanes: {
+        type: Array,
+        value: function (){ return ['html', 'js', 'css', 'result'];},
+        reflectToAttribute: true,
+        notify: true
+      },
+
       /**
        * Event bus to communicate with ASQ
        */

@@ -1,11 +1,10 @@
 <link rel="import" href="../../polymer/polymer.html">
 <link rel="import" href="../../ace-element/ace-element.html">
+<link rel="import" href="../../iron-selector/iron-selector.html">
 <link rel="import" href="../../iron-flex-layout/iron-flex-layout.html">
 <link rel="import" href="../../iron-icons/iron-icons.html">
 <link rel="import" href="../../iron-list/iron-list.html">
 <link rel="import" href="../../iron-pages/iron-pages.html">
-<link rel="import" href="../../paper-drawer-panel/paper-drawer-panel.html">
-<link rel="import" href="../../paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../../paper-tabs/paper-tabs.html">
 <link rel="import" href="../../paper-tabs/paper-tab.html">
 <link rel="import" href="../../paper-styles/color.html">
@@ -27,7 +26,7 @@ var c = document.getElementById("c");</pre>
       </template> 
     </asq-fiddle-q-presenter>
 
-@group DELFT Elements
+@group ASQ Elements
 @element asq-fiddle-q-presenter
 @demo demo/index.html
 -->
@@ -38,35 +37,78 @@ var c = document.getElementById("c");</pre>
       @apply(--layout-vertical);
       @apply(--layout-flex);
       min-height:300px;
-      display: block;
       box-sizing: border-box;
       --paper-tabs-selection-bar-color: #333;
     }
 
+    .pane{
+      @apply(--layout-vertical);
+      position:absolute;
+      top:0;
+      bottom:0;
+      left:0;
+      right:0;
+      border: 1px solid #f0f0f0;
+      display: none;
+    }
+
+    .pane.iron-selected{
+      display: block;
+    }
+
+    #submissions-pane{
+      width: 120px;
+      @apply(--layout-vertical);
+    }
+
+    #toolbar{
+      @apply(--layout-horizontal);
+      @apply(--layout-center-justified);
+      padding: 5px 0;
+    }
+
+    #tabSelector{
+      @apply(--layout-horizontal);
+      border-top: 1px solid #BDBDBD;
+      border-bottom: 1px solid #BDBDBD;
+      border-left: 1px solid #BDBDBD;
+    }
+
+    #paneSelector{
+      @apply(--layout-flex);
+      position: relative;
+    }
+
+    paper-item{
+      --paper-item:{
+        cursor: pointer;
+        min-height: 34px;
+        padding: 0 10px;
+        border-right: 1px solid #BDBDBD;
+      };
+
+      --paper-item-focused-before:{
+        background: transparent;
+      }
+    }
+
+    paper-item.iron-selected{
+      background: rgba(0, 0, 0, 0.12);
+    }
+
     #main-content {
-      /*@apply(--layout-flex);*/
+      @apply(--layout-flex);
+      @apply(--layout-vertical);
+    }
+
+    #pane-container{
+      @apply(--layout-flex);
       @apply(--layout-horizontal);
     }
 
-    #left-column,
-    #right-column{
-      @apply(--layout-flex);
-      @apply(--layout-vertical);
-    }
-
-    #html-editor-pane,
-    #css-editor-pane,
-    #js-editor-pane,
-    #result-pane{
-      @apply(--layout-flex);
-      @apply(--layout-vertical);
-      position:relative;
-      z-index: 0;
-      border: 1px solid #f0f0f0;
-    }
-
     #result-iframe{
-       @apply(--layout-flex);
+       width: 100%;
+       height: 100%;
     }
 
     .ace-editor{
@@ -90,26 +132,16 @@ var c = document.getElementById("c");</pre>
       width: 4px;
       background: #fafafa;
       cursor: ew-resize;
+      position:absolute;
+      top: 0px;
+      bottom:0px;
+      right: auto;
+      z-index: 10;
     }
 
-    .h-seperator{
-      height: 4px;
-      background: #fafafa;
-      cursor: ns-resize;
-    }
-
-    #paper-drawer-panel-container{
-      position: relative;
-      @apply(--layout-flex);
-    }
-
-    #paper-drawer-panel-container iron-pages{
+    iron-pages{
      @apply(--layout-flex);
      @apply(--layout-vertical);
-    }
-
-    div[drawer]{
-      @apply(--layout-vertical);
     }
 
     #submissionList {
@@ -136,13 +168,39 @@ var c = document.getElementById("c");</pre>
     <div class="content-wrapper">
       <content id="contentTmpl" select="template[seed]"></content>
       <content></content>
-    </div>
-    
-    <paper-icon-button style="width: 25px;" icon="icons:menu" on-click="togglePanel" paper-drawer-toggle></paper-icon-button>
-    
-    <div id="paper-drawer-panel-container">
-      <paper-drawer-panel id="drawerPanel" responsive-width="900px" right-drawer>
-        <div drawer>
+    </div>       
+    <div id="main-content" main>
+      <div id="toolbar">
+        <iron-selector id="tabSelector" multi attr-for-selected="name"  selected-values="{{selectedPanes}}">
+          <paper-item name="html">HTML</paper-item>
+          <paper-item name="js">JS</paper-item>
+          <paper-item name="css">CSS</paper-item>
+          <paper-item name="result">Result</paper-item>
+        </iron-selector>
+      </div>
+      <div id="pane-container">
+        <iron-selector id="paneSelector" multi attr-for-selected="name" selected-values="{{selectedPanes}}" activate-event=""> 
+          <div id="html-pane" class="pane" name="html">
+            <ace-element id="html" class="ace-editor" theme="textmate" mode="html" on-value-changed="_editorValueChanged"></ace-element>
+            <div class="pane-label">HTML</div>
+          </div>
+          <div class="v-seperator" id="htmlVSep" on-mousedown="_onMousedown" hidden$="{{_hideSeperatorForPane('html',  selectedPanes.*)}}"></div>
+          <div id="js-pane" class="pane" name="js">
+            <ace-element id="js" class="ace-editor" theme="textmate" mode="javascript"></ace-element>
+            <div class="pane-label">JavaScript</div>
+          </div>
+          <div class="v-seperator" id="jsVSep" on-mousedown="_onMousedown" hidden$="{{_hideSeperatorForPane('js',  selectedPanes.*)}}"></div>
+          <div id="css-pane" class="pane" name="css">
+            <ace-element id="css" class="ace-editor" theme="textmate" mode="css"></ace-element>
+            <div class="pane-label">CSS</div>
+          </div>
+          <div class="v-seperator" id="cssVSep" on-mousedown="_onMousedown" hidden$="{{_hideSeperatorForPane('css',  selectedPanes.*)}}"></div>
+          <div id="result-pane" class="pane" name="result">
+            <iframe id="result-iframe" src="" frameborder="0"></iframe>
+            <div class="pane-label">Result</div>
+          </div>
+        </iron-selector>
+        <div id="submissions-pane">
           <paper-tabs selected="{{_selectedTab}}" selected="0" selected-attribute="active" noink role="tablist">     
             <paper-tab role="tab"></paper-tab>
             <paper-tab role="tab">Submissions</paper-tab>            
@@ -153,38 +211,13 @@ var c = document.getElementById("c");</pre>
             <iron-list id="submissionList" items="[[
             submissions]]" as="submission" selection-enabled selected-item="{{_selectedSubmissionItem}}">
               <template>
-                <paper-item>#<span>[[index]]</span>&nbsp;&nbsp;<span>[[submission.submission.html]]</span>
-                </paper-item>
+                <paper-item>#<span>[[indexPlusOne(index)]]</span>&nbsp;&nbsp;<span>[[submission.submission.html]]</span>
+                </paper-item>ASQ
               </template>
             </iron-list>
           </iron-pages>
         </div>
-        <div id="main-content" main>
-          <div id="left-column">
-            <div id="html-editor-pane">
-              <ace-element id="html-editor" class="ace-editor" theme="textmate" mode="html" on-value-changed="_editorValueChanged"></ace-element>
-              <div class="pane-label">HTML</div>
-            </div>
-            <div class="h-seperator" id="left-h-seperator" on-mousedown="onMousedown"></div>
-            <div id="js-editor-pane">
-              <ace-element id="js-editor" class="ace-editor" theme="textmate" mode="javascript"></ace-element>
-              <div class="pane-label">JavaScript</div>
-            </div>
-          </div>
-          <div class="v-seperator" on-mousedown="onMousedown"></div>
-          <div id="right-column">
-            <div id="css-editor-pane">
-              <ace-element id="css-editor" class="ace-editor" theme="textmate" mode="css"></ace-element>
-              <div class="pane-label">CSS</div>
-            </div>
-            <div class="h-seperator" id="right-h-seperator" on-mousedown="onMousedown"></div>
-            <div id="result-pane">
-              <iframe id="result-iframe" src="" frameborder="0"></iframe>
-              <div class="pane-label">Result</div>
-            </div>
-          </div>
-        </div>
-      </paper-drawer-panel>
+      </div>
     </div>
   </template>
 
@@ -233,6 +266,18 @@ var c = document.getElementById("c");</pre>
       },
 
       /**
+       * The panes to display. When specifying it as an attribute, use an array serialized as string.
+       * For Example: `selected-panes='["js", "result"]'`. Notice the single quotes for the attributes
+       * and the double quotes for the array items.
+       */
+      selectedPanes: {
+        type: Array,
+        value: function (){ return ['html', 'js', 'css', 'result'];},
+        reflectToAttribute: true,
+        notify: true
+      },
+
+      /**
        * Event bus to communicate with ASQ
        */
       eventBus: {
@@ -258,14 +303,15 @@ var c = document.getElementById("c");</pre>
 
     attached: function() {
       //delay to make sure ace-editors are initialized
-      setTimeout(function(){
+      this.debounce('init-editors', function(){
 
-        var editors = ["html-editor", "css-editor", "js-editor"];
+        this._initPosition();
+
+        var editors = ['html', 'js', 'css'];
         // listen for value change on editors
         editors.forEach(function(editorId){
           this.$[editorId].addEventListener('editor-input', this._editorValueChanged.bind(this))
           this.$[editorId].editor.resize();
-
         }.bind(this))
 
         // initialize editor values
@@ -274,19 +320,13 @@ var c = document.getElementById("c");</pre>
         
         var initVal = {};
         editors.forEach(function(editorId){
-          var prop = editorId.replace('-editor', '');
-          var el = tpl.content.querySelector('[' + prop + ']')
+          var el = tpl.content.querySelector('[' + editorId + ']')
           if(!el) return;
-          initVal[prop] = el.innerHTML;
+          initVal[editorId] = el.innerHTML;
         }.bind(this))
 
         this.value = initVal;
-
-      }.bind(this), 10)
-    },
-
-    togglePanel: function(){
-      this.$.drawerPanel.togglePanel();
+      }, 1);
     },
 
     _selectedSubmissionItemChanged: function(newItem, old){
@@ -295,26 +335,25 @@ var c = document.getElementById("c");</pre>
     },
 
     _valueChanged: function(newVal){
-      var editors = ["html-editor", "css-editor", "js-editor"];
+      var editors = ['html', 'js', 'css'];
       editors.forEach(function(editorId){
-        var prop = editorId.replace('-editor', '');
-        if(this.value[prop] && this.$[editorId].editorValue != this.value[prop]){
-          this.$[editorId].editorValue = this.value[prop];
+        if(this.value[editorId] && this.$[editorId].editorValue != this.value[editorId]){
+          this.$[editorId].editorValue = this.value[editorId];
+          this.$[editorId].editor.clearSelection(1);
         }
       }.bind(this))
     },
 
     _editorValueChanged: function(evt){
-      var prop = evt.target.id.replace('-editor', '');
-      this.set('value.'+prop, evt.target.editorValue);
+      this.set('value.'+evt.target.id, evt.target.editorValue);
       this._render();
     },
 
     _prepareSource: function() {
-      var html =  this.$["html-editor"].editorValue,
-          css =  this.$["css-editor"].editorValue,
-          js =  this.$["js-editor"].editorValue,
-          src = '';
+      var html =  this.$['html'].editorValue;
+      var css =  this.$['css'].editorValue;
+      var js =  this.$['js'].editorValue;
+      var src = '';
 
       // HTML
       src = this._baseTemplate.replace('</body>', html + '</body>');
@@ -342,75 +381,92 @@ var c = document.getElementById("c");</pre>
     },
 
     resizeEditors: function(){
-      var editors = ["html-editor", "css-editor", "js-editor"];
+      var editors = ['html', 'js', 'css'];
       editors.forEach(function(editorId){
        this.$[editorId].editor.resize();
       }.bind(this));
     },
 
-    calculateHorizontalResize: function(mouseX){
-      var X = mouseX - this.$['main-content'].offsetLeft ;
-      var totalW = this.$['main-content'].offsetWidth;
-      var left = (100 * X / totalW) >> 0;
+    _initPosition: function(){
+      var sepSize = 4;
+      var totalW = this.$.paneSelector.offsetWidth;
+      var n = this.selectedPanes.length;
+      var paneSize = (totalW - (n - 1) * sepSize)/n;
+      var paneSizePerc = 100 * paneSize / totalW;
+      var sepSizePerc = 100 * sepSize / totalW;
 
-      left = (left > 100)? 100 : left;
-      left = (left < 1)? 1 : left;
+      var l = 0;
+      var r = 100 - paneSizePerc;
 
-      this.$["left-column"].style.flex = left;
-      this.$["right-column"].style.flex = 100 - left;
-      //this.resizeEditors();
+      var els = this.$.paneSelector.children;
+      [].forEach.call(els, function(el){
+        
+        if (el.classList.contains('pane')){
+          if (el.classList.contains('iron-selected')){
+            el.style.left = l + '%';
+            el.style.right = r + '%';
+            l += paneSizePerc;
+            r -= paneSizePerc;
+          }
+        } else { //separator
+          if (el.hasAttribute('hidden')) return;
+          el.style.left = l + '%';
+          l += sepSizePerc;
+          r -= sepSizePerc;
+        }
+      });
+
+      this.debounce('resize-editors', this.resizeEditors, 100);
     },
 
-    calculateVerticalResize: function(mouseY, loc){
-      var Y = mouseY - this.$['main-content'].offsetTop ;
-      var totalH = this.$['main-content'].offsetHeight;
+    calculateHorizontalResize: function(mouseX, paneName){
+      var panes = this.selectedPanes;
+      var pane =  this.$[paneName + '-pane'];
+      var sep = this.$[paneName + 'VSep'];
+      var rightPaneName = panes[panes.indexOf(paneName) + 1];
+      var rightPane = this.$[rightPaneName + '-pane'];
+      var X = mouseX - this.$.paneSelector.offsetLeft ;
+      var totalW = this.$.paneSelector.offsetWidth;
+      var left = 100 * X / totalW;
+      left = (left > 100) ? 100 : left;
+      left = (left < 1) ? 1 : left;
+      var sepSize = 4;
+      var sepSizePerc = 100 * sepSize / totalW;
 
-      var top = (100 * Y / totalH) >> 0;
+      var paneLeft = parseFloat(pane.style.left.replace('%', ''));
+      var newRight = 100 - (left + sepSizePerc);
+      var minPaneW = 150 * 100/ totalW;
 
-      top = (top > 100)? 100 : top;
-      top = (top < 1)? 1 : top;
-
-      if(loc =="left"){
-        this.$["html-editor-pane"].style.flex = top;
-        this.$["js-editor-pane"].style.flex = 100 - top;
-      }else{
-        this.$["css-editor-pane"].style.flex = top;
-        this.$["result-pane"].style.flex = 100 - top;
+      // make sure it's not smaller than minPaneW
+      if((100 - newRight - paneLeft) < minPaneW){
+        newRight = 100 - paneLeft - minPaneW
       }
-      
-      //this.resizeEditors();
+      pane.style.right = newRight + '%';
+      sep.style.left = (100 - newRight) + '%';
+      rightPane.style.left = (100 - newRight -sepSizePerc) + '%';
+
+      this.debounce('resize-editors', this.resizeEditors, 100);
     },
 
-    onMousedown: function(evt, detail){
+    _onMousedown: function(evt, detail){
       event.preventDefault();
       var sepEl = event.currentTarget;
-      var isVertivalResize = false;
-      var loc;
+      var pane;
 
       //prevent iframe from consuming mousemove events
-      this.$['result-pane'].style.pointerEvents = "none";
+      this.$['result-pane'].style.pointerEvents = 'none';
 
-
-      if (sepEl.id == 'left-h-seperator'){ 
-        isVertivalResize = true;
-        loc="left";
-      }else if(sepEl.id == 'right-h-seperator'){
-        isVertivalResize = true;
-        loc="right";
+      if(sepEl.id.indexOf('VSep') > -1){
+        pane = sepEl.id.replace('VSep', '')
       }
 
       var onMousemove = function(evt){
-        if(isVertivalResize){
-          this.calculateVerticalResize(evt.pageY, loc);
-        }else{
-          this.calculateHorizontalResize(evt.pageX);
-        }
-        
+        this.calculateHorizontalResize(evt.pageX, pane);
       }.bind(this);
 
       var onMouseup = function(evt){
         //restore iframe events
-        this.$['result-pane'].style.pointerEvents = "auto";
+        this.$['result-pane'].style.pointerEvents = 'auto';
 
         document.removeEventListener('mousemove', onMousemove)
         document.removeEventListener('mouseup', onMouseup)
@@ -446,9 +502,27 @@ var c = document.getElementById("c");</pre>
       this.submissions = evt.question.answers;
     },
 
+    _hideSeperatorForPane: function(pane){
+      var orderedPanes = this.selectedPanes.sort(function(a,b){
+        var order = { html: 0, js: 1, css: 2, result: 3 };
+
+        if(order[a] > order[b]){
+          return 1;
+        }
+        return -1;
+      })
+      // hide if it's the last pane or if the pane is hidden
+      var idx = orderedPanes.indexOf(pane);
+      return idx < 0 || (idx + 1) == this.selectedPanes.length;
+    },
+
     _eventBusChanged: function (eventBus, old) {
       if(!eventBus) return;
       eventBus.on('asq:question_type', this._onQuestionType.bind(this));
+    },
+
+    indexPlusOne: function(index){
+      return ++index;
     }
   });
 

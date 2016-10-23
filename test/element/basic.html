@@ -1,0 +1,33 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+
+    <script src="../../../webcomponentsjs/webcomponents-lite.js"></script>
+    <script src="../../../web-component-tester/browser.js"></script>
+
+    <link rel="import" href="../../asq-fiddle-q.html">
+  </head>
+  <body>
+
+    <test-fixture id="asqFiddleFixture">
+      <template>
+        <asq-fiddle-q></asq-fiddle-q>
+      </template>
+    </test-fixture>
+
+    <script>
+      var afq;
+      setup(function() {
+        afq = fixture('asqFiddleFixture');
+      });
+
+      test('default role', function() {
+        assert.strictEqual(afq.role, 'viewer');
+      });
+
+    </script>
+
+  </body>
+</html>
