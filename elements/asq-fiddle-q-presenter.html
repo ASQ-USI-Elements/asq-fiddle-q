@@ -181,17 +181,17 @@ var c = document.getElementById("c");</pre>
       <div id="pane-container">
         <iron-selector id="paneSelector" multi attr-for-selected="name" selected-values="{{selectedPanes}}" activate-event=""> 
           <div id="html-pane" class="pane" name="html">
-            <ace-element id="html" class="ace-editor" theme="textmate" mode="html" on-value-changed="_editorValueChanged"></ace-element>
+            <ace-element id="html" class="ace-editor" font-size="{{editorFontSize}}" theme="textmate" mode="html" on-value-changed="_editorValueChanged"></ace-element>
             <div class="pane-label">HTML</div>
           </div>
           <div class="v-seperator" id="htmlVSep" on-mousedown="_onMousedown" hidden$="{{_hideSeperatorForPane('html',  selectedPanes.*)}}"></div>
           <div id="js-pane" class="pane" name="js">
-            <ace-element id="js" class="ace-editor" theme="textmate" mode="javascript"></ace-element>
+            <ace-element id="js" class="ace-editor" font-size="{{editorFontSize}}" theme="textmate" mode="javascript"></ace-element>
             <div class="pane-label">JavaScript</div>
           </div>
           <div class="v-seperator" id="jsVSep" on-mousedown="_onMousedown" hidden$="{{_hideSeperatorForPane('js',  selectedPanes.*)}}"></div>
           <div id="css-pane" class="pane" name="css">
-            <ace-element id="css" class="ace-editor" theme="textmate" mode="css"></ace-element>
+            <ace-element id="css" class="ace-editor" font-size="{{editorFontSize}}" theme="textmate" mode="css"></ace-element>
             <div class="pane-label">CSS</div>
           </div>
           <div class="v-seperator" id="cssVSep" on-mousedown="_onMousedown" hidden$="{{_hideSeperatorForPane('css',  selectedPanes.*)}}"></div>
@@ -273,6 +273,17 @@ var c = document.getElementById("c");</pre>
       selectedPanes: {
         type: Array,
         value: function (){ return ['html', 'js', 'css', 'result'];},
+        reflectToAttribute: true,
+        notify: true
+      },
+
+      /**
+       * The font size of the editors.
+       * Example: `font-size="16em"`
+       */
+      editorFontSize: {
+        type: String,
+        value: '12px',
         reflectToAttribute: true,
         notify: true
       },

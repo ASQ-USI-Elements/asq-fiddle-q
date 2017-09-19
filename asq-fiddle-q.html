@@ -13,7 +13,7 @@
 
 ### Example:
 
-    <asq-fiddle-q selected-panes='["html", "js", "result"]'>
+    <asq-fiddle-q selected-panes='["html", "js", "result"]' editor-font-size="1.2em;">
       <asq-stem><h4>Paint a circle in the canvas</h4></asq-stem>
       <template seed>
         <pre html><canvas id="c"></canvas></pre>
@@ -46,6 +46,7 @@
          event-bus="[[eventBus]]"
          value="{{value}}"
          selected-panes="{{selectedPanes}}"
+         editor-font-size="{{editorFontSize}}"
         >
          <content></content>
        </asq-fiddle-q-viewer>
@@ -59,6 +60,7 @@
        event-bus="[[eventBus]]"
        value="{{value}}"
        selected-panes="{{selectedPanes}}"
+       editor-font-size="{{editorFontSize}}"
       >
          <content></content>
        </asq-fiddle-q-presenter>
@@ -84,6 +86,17 @@
       selectedPanes: {
         type: Array,
         value: function (){ return ['html', 'js', 'css', 'result'];},
+        reflectToAttribute: true,
+        notify: true
+      },
+
+      /**
+       * The font size of the editors.
+       * Example: `font-size="16em"`
+       */
+      editorFontSize: {
+        type: String,
+        value: '12px',
         reflectToAttribute: true,
         notify: true
       },
