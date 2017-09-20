@@ -299,7 +299,8 @@ var c = document.getElementById("c");</pre>
     },
 
     observers: [
-      '_valueChanged(value.*)'
+      '_valueChanged(value.*)',
+      '_selectedPanesChanged(selectedPanes.*)'
     ],
 
     _baseTemplate: "<!doctype html>\n" +
@@ -525,6 +526,12 @@ var c = document.getElementById("c");</pre>
       // hide if it's the last pane or if the pane is hidden
       var idx = orderedPanes.indexOf(pane);
       return idx < 0 || (idx + 1) == this.selectedPanes.length;
+    },
+
+    _selectedPanesChanged(){
+      this.debounce('selected-panes-changed', function(){
+        this._initPosition();
+      }, 1)
     },
 
     _eventBusChanged: function (eventBus, old) {
